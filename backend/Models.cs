@@ -4,12 +4,13 @@ namespace backend.Models;
 
 public class BackendDbContext : DbContext {
     public DbSet<TodoItem> TodoItems { get; set; }
+    public BackendDbContext(DbContextOptions<BackendDbContext> options) : base(options) {}
 }
 
 public class TodoItem {
-    public int ItemId { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string Title { get; set; }
-    public string Content { get; set; }
+    public required int ItemId { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public required string Title { get; set; }
+    public required string Content { get; set; }
     public bool Complete { get; set; }
 }

@@ -1,0 +1,21 @@
+
+Things we need to include for sure:
+* Add a TodoItem record, sqlite backed, endpoints (/list, /details, /update)
+* Add a UI with 2 "pages": list and details
+* Indexes
+* Tests
+    * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/test-min-api?view=aspnetcore-10.0
+* Logging + error handling
+    * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-10.0
+    * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-10.0
+
+Optional stuff:
+* Pagination
+* Docker compose for backend + frontend (and later, HL7 listener)
+* Add images to each TodoItem, UI component for drawing outlines on them
+* Add an HL7 listener
+    https://saravanansubramanian.com/blog/hl72xdotnetprogramming/
+    https://github.com/nHapiNET/nHapi
+    https://github.com/dib0/NHapiTools
+    https://github.com/dib0/HL7Fuse
+* Add an .http file: https://learn.microsoft.com/en-us/aspnet/core/test/http-files?view=aspnetcore-10.0

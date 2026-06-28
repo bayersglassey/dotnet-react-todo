@@ -1,3 +1,18 @@
+
+>>
+>> HEY THERE!
+>> This file is a stream-of-consciousness record of what I did for the take-home
+>> assignment.
+>> Maybe it has too much information for your liking, in which case please have
+>> a look at README.md!
+>>
+>> NOTE: I didn't use an LLM for any of this.
+>> Whenever I use "google" as a verb, I secretly mean "search lite.duckduckgo.com",
+>> because it's quick & gives me a simple list of links, like google used to be & do.
+>>
+
+========================================================================================
+
 Looked up "dotnet core linux". Ran this:
 
 $ sudo apt install dotnet-sdk-10.0
@@ -253,5 +268,47 @@ of work ourselves: let's use Google's "Material" styles.
 I googled "material react" and found "Material UI":
 https://mui.com/
 
+$ npm install @mui/material @emotion/react @emotion/styled
+$ npm install @fontsource/roboto
+$ npm install @mui/icons-material
+
+========================================================================================
+
+Started looking at the backend again.
+Read up on .NET Core logging, testing, error handling:
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/test-min-api?view=aspnetcore-10.0
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-10.0
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-10.0
+
+Tweaked the csproj, launchsettings, etc.
+Decided to create a TodoItem model.
+Googled "entity framework model", found the EF Core docs: https://learn.microsoft.com/en-us/ef/core/
+
+$ dotnet tool install --global dotnet-ef
+
+And the SQLite provider:
+https://learn.microsoft.com/en-us/ef/core/providers/sqlite/?tabs=dotnet-core-cli
+
+$ dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+
+Hmmmm, I'm seeing this:
+
+$ dotnet build
+Restore succeeded with 1 warning(s) in 0.4s
+    /home/bag/ownrepos/function-health/backend/backend.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+  backend net10.0 succeeded with 1 warning(s) (0.3s) → bin/Debug/net10.0/backend.dll
+    /home/bag/ownrepos/function-health/backend/backend.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+
+...but in my csproj, I only see:
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+
+...so is the issue here that the latest version of Microsoft.EntityFrameworkCore.Sqlite is using
+an out-of-date version of SQLitePCLRaw.lib.e_sqlite3?.. how do I fix that?..
+
+========================================================================================
+
+For a while, I was actually just coding, not writing stuff into this NOTES.txt.
+But I left lots of comments in Backend.cs, and started filling out README.md.
 
 

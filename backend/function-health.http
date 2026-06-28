@@ -1,0 +1,6 @@
+@function_health_HostAddress = http://localhost:5198
+
+GET {{function_health_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

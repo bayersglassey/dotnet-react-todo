@@ -1,0 +1,257 @@
+Looked up "dotnet core linux". Ran this:
+
+$ sudo apt install dotnet-sdk-10.0
+
+Ran some basic commands:
+
+$ dotnet --list-runtimes
+Microsoft.AspNetCore.App 10.0.9 [/usr/lib/dotnet/shared/Microsoft.AspNetCore.App]
+Microsoft.NETCore.App 10.0.9 [/usr/lib/dotnet/shared/Microsoft.NETCore.App]
+
+$ dotnet --list-sdks
+10.0.109 [/usr/lib/dotnet/sdk]
+
+The first time I ran one of those commands, it also printed out a welcome message, including some links:
+
+Write your first app: https://aka.ms/dotnet-hello-world
+Find out what's new: https://aka.ms/dotnet-whats-new
+Explore documentation: https://aka.ms/dotnet-docs
+Report issues and find source on GitHub: https://git
+
+...so, I went to that "write your first app" link.
+
+$ dotnet new
+The 'dotnet new' command creates a .NET project based on a template.
+
+Common templates are:
+Template Name        Short Name  Language    Tags
+-------------------  ----------  ----------  -----------------------
+Blazor Web App       blazor      [C#]        Web/Blazor/WebAssembly
+Class Library        classlib    [C#],F#,VB  Common/Library
+Console App          console     [C#],F#,VB  Common/Console
+MSTest Test Project  mstest      [C#],F#,VB  Test/MSTest/Desktop/Web
+Windows Forms App    winforms    [C#],VB     Common/WinForms
+WPF Application      wpf         [C#],VB     Common/WPF
+
+So I did `dotnet new blazor`, and tried to build & run what it gave me:
+
+$ dotnet run
+Using launch settings from /home/bag/temp/dotnet/Properties/launchSettings.json...
+Building...
+warn: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[35]
+      No XML encryptor configured. Key {7e67cc1b-1bf4-4dd9-a46d-e10b46b6b175} may be persisted to storage in unencrypted form.
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5013
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /home/bag/temp/dotnet
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
+      Failed to determine the https port for redirect.
+
+Hooray! I went to http://localhost:5013 and saw a little app. It says "Hello world", it has another page with a counter, and another page where it downloads weather information from somewhere and displays it in a table.
+
+========================================================================================
+
+Ran `git init` and then tried to decide what to put in .gitignore.
+Looked at all the files which had been created, and seems like obj/ and bin/ could be ignored.
+Googled "dotnet core gitignore" and someone on stackoverflow suggested running `dotnet new gitignore`.
+Ran that, looked at the .gitignore it created, and it looked good!
+
+Also realized that there were more templates available through `dotnet new` than I had thought. Ran `dotnet new list` to see them all.
+I notice these:
+* ASP.NET Core Web API
+* ASP.NET Core Web App (Model-View-Controller)
+
+...and I wonder, if I add both of those, will I get the kind of "web app with API" structure I'm tasked with?..
+
+========================================================================================
+
+No, I can't combine them, they "fight" over some of the same files:
+
+$ dotnet new mvc
+
+$ dotnet new webapi
+Creating this template will make changes to existing files:
+  Overwrite   ./dotnet2.csproj
+  Overwrite   ./appsettings.json
+  Overwrite   ./appsettings.Development.json
+  Overwrite   ./Program.cs
+  Overwrite   ./Properties/launchSettings.json
+
+To create the template anyway, run the command with '--force' option:
+   dotnet new webapi --force
+
+But ok, I could create one, do a Git commit, then overwrite it with the other, and see what's in `git diff`.
+Aaaand it's not a lot of difference! I won't post the full diff here, but look at this:
+
+$ git diff --stat
+ Program.cs                     | 40 ++++++++++++++++++++++++++--------------
+ Properties/launchSettings.json |  8 ++++----
+ dotnet2.csproj                 |  4 ++++
+ 3 files changed, 34 insertions(+), 18 deletions(-)
+
+I learned a couple of things there. The major differences seem to be:
+* The MVC app does the following (presumably these are middlewares):
+    app.UseRouting();
+    app.UseAuthorization();
+    app.MapStaticAssets();
+    app.MapControllerRoute(...etc...).WithStaticAssets();
+* The API app does the following:
+    app.MapGet("/weatherforecast", () => { ...etc... }).WithName("GetWeatherForecast");
+
+So that makes sense. We can "map" MVC controllers and API endpoints.
+Let's take a step back for a second, and check the assignment's instructions.
+In fact, we're not being asked to do MVC; we're being asked to use React or Vue on the frontend.
+So actually, we just need an API on the backend, not controllers etc.
+
+In Django, there is Django REST Framework, where we can have API endpoints automatically generated for our models.
+I wonder if there's something like that in .NET Core?..
+Ideally, we want API endpoints and also front-end components generated for us.
+Does Blazor do that?.. let's go follow the tutorial: https://dotnet.microsoft.com/en-us/learn/aspnet/blazor-tutorial/install
+...nope, Blazor looks like MVC, with a "Razor" templating language. Very "classic ASP".
+
+So, I googled "dotnet core equivalent of django rest framework", and found this:
+https://www.reddit.com/r/dotnet/comments/hndlfb/django_rest_framework_equivalent_with_net/
+> Entity Framework is the ORM for you. Django's ORM is the most similar experience I've ever had to it.
+> Other than that the standard dotnet template is an excellent starting point. For something more advanced I recommend this template: https://github.com/jasontaylordev/CleanArchitecture
+> It uses Mediatr with CQRS pattern which may be a bit of an overkill for basic CRUD but on the other hand you will be a bit more prepared if there is need for more advanced business logic.
+
+I remember reading about CQRS once on Martin Fowler's blog: it's where you use different models for reads vs writes, basically.
+In our case, we're learning .NET Core by making a TODO app, so let's keep it simple for now and just do CRUD.
+So, next let's find an Entity Framework tutorial...
+
+========================================================================================
+
+By the way, I love developing at a REPL. For Python, there is iPython; for C#, is there something?..
+I found this: https://github.com/jonsequitur/dotnet-repl
+And installed it with: `dotnet tool install -g dotnet-repl`
+
+Now let's run it and see if we can import & interact with any of our code so far...
+For instance, in Models/ErrorViewModel.cs I see an ErrorViewModel class. Can we instantiate one of those?..
+I messed around with it a bit, couldn't find much documentation. It doesn't seem like people use this REPL much.
+Also, I found this:
+https://github.com/dotnet/interactive/issues/4163
+> The Polyglot Notebooks Extension will be deprecated March 27th, 2026.
+> .NET Interactive will be deprecated April 24th, 2026.
+
+...and ".NET Interactive" is what dotnet-repl says it's using under the hood! But that deprecation notice says that going forward, "file-based apps" are the recommended thing to use instead.
+https://learn.microsoft.com/en-us/dotnet/core/sdk/file-based-apps
+https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/tutorials/file-based-programs
+> File-based apps are programs contained within a single *.cs file that you build and run without a corresponding project (*.csproj) file.
+
+But I already have a .csproj file!.. it was generated by `dotnet new`. So I guess the way to quickly test parts of my .NET code is to create little CLI applications.
+The app's entry point is Program.cs; can I make a Program2.cs and run it directly?..
+Looked at the output of `dotnet run --help`, and it looks like `--file <FILE_PATH>` might be just the ticket.
+
+$ cat Program2.cs
+using dotnet2.Models;
+var error = new ErrorViewModel();
+Console.WriteLine(error);
+
+$ dotnet run Program2.cs
+Using launch settings from /home/bag/temp/dotnet2/Properties/launchSettings.json...
+Building...
+/home/bag/temp/dotnet2/Program2.cs(2,1): error CS8802: Only one compilation unit can have top-level statements.
+
+Interesting. So Program.cs and Program2.cs can't both be entry points. If I rename Program.cs to some other extension than .cs, then `dotnet run` runs Program2.cs:
+
+$ dotnet run
+Using launch settings from /home/bag/temp/dotnet2/Properties/launchSettings.json...
+Building...
+dotnet2.Models.ErrorViewModel
+
+I tried renaming Program2.cs to Program2.csx, because I saw somewhere that .csx is for C# scripts.
+I can then run it with `--file`, but it can't find the "dotnet2" namespace (i.e. the root namespace for my project):
+
+$ dotnet run --file Program2.csx
+Using launch settings from /home/bag/temp/dotnet2/Properties/launchSettings.json...
+Building...
+/home/bag/temp/dotnet2/Program2.csx(1,7): error CS0246: The type or namespace name 'dotnet2' could not be found (are you missing a using directive or an assembly reference?)
+
+Heyy, I tried adding `#:project dotnet2.csproj` to the top of Program2.csx, and now it works!
+
+$ dotnet run --file Program2.csx
+Using launch settings from /home/bag/temp/dotnet2/Properties/launchSettings.json...
+Building...
+dotnet2.Models.ErrorViewModel
+
+Cool. So now hopefully we'll be able to add little scripts to test things out. Let's look at Entity Framework, get some models backed by SQLite, and see if we can actually interact with the database via a .csx script.
+
+========================================================================================
+
+Actually, I found this template:
+https://github.com/jasontaylordev/CleanArchitecture
+
+$ dotnet new install Clean.Architecture.Solution.Template
+$ dotnet new ca-sln -cf react -db sqlite -o TodoBag
+
+I had to fix CRLF with `find | xargs dos2unix` and tweak the required SDK version, and then:
+
+$ dotnet run --project src/AppHost/
+Using launch settings from src/AppHost/Properties/launchSettings.json...
+Building...
+/home/bag/temp/TodoBag/src/ServiceDefaults/ServiceDefaults.csproj : error NU1902: Warning As Error: Package 'OpenTelemetry.Api' 1.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j
+/home/bag/temp/TodoBag/src/ServiceDefaults/ServiceDefaults.csproj : error NU1902: Warning As Error: Package 'OpenTelemetry.Exporter.OpenTelemetryProtocol' 1.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4625-4j76-fww9
+...etc...
+/home/bag/temp/TodoBag/src/AppHost/AppHost.csproj : error NU1902: Warning As Error: Package 'MessagePack' 2.5.192 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w567-gjr2-hm5j
+/home/bag/temp/TodoBag/src/AppHost/AppHost.csproj : error NU1902: Warning As Error: Package 'MessagePack' 2.5.192 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-wfr3-xj75-pfwh
+
+The build failed. Fix the build errors and run again.
+
+...so, I dunno if we want to mess around with this guy.
+Actually yeah, looking through the source, it looks super overengineered, like:
+
+public interface IApplicationDbContext
+{
+    DbSet<TodoList> TodoLists { get; }
+
+    DbSet<TodoItem> TodoItems { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+}
+
+Booooo! No thank yoooou!
+
+========================================================================================
+
+HL7 in .NET:
+
+https://saravanansubramanian.com/blog/hl72xdotnetprogramming/
+https://github.com/nHapiNET/nHapi
+https://github.com/dib0/NHapiTools
+https://github.com/dib0/HL7Fuse
+
+========================================================================================
+
+Let's create the React frontend.
+
+I had a look at Next.js, because one of the UI folks at work used it recently for a demo.
+But reading a bit, it sounds like its purpose is to let you use the same Typescript code
+for the back and frontend; and for this assignment, we're supposed to use .NET Core on
+the backend. So no Next.js for us!
+
+$ npx create-react-app frontend
+
+  npm start
+    Starts the development server.
+
+  npm run build
+    Bundles the app into static files for production.
+
+  npm test
+    Starts the test runner.
+
+  npm run eject
+    Removes this tool and copies build dependencies, configuration files
+    and scripts into the app directory. If you do this, you can’t go back!
+
+Okay, we have a basic app. Now let's make sure it looks fancy while we do a minimum
+of work ourselves: let's use Google's "Material" styles.
+I googled "material react" and found "Material UI":
+https://mui.com/
+
+
+

@@ -311,4 +311,32 @@ an out-of-date version of SQLitePCLRaw.lib.e_sqlite3?.. how do I fix that?..
 For a while, I was actually just coding, not writing stuff into this NOTES.txt.
 But I left lots of comments in Backend.cs, and started filling out README.md.
 
+========================================================================================
+
+Implementing the controllers, found this "APIs overview" page:
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/apis?view=aspnetcore-10.0
+
+Oooooooooh and then this one, which has lots of really nice snippets, showing
+in particular how to implement simple CRUD endpoints without a lot of class-heavy
+syntax!..
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0
+
+Okay, let's switch to that.
+But let's mention somewhere that I did start to implement a TodoItemController
+based on the class-heavy syntax shown here:
+https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-10.0
+
+...but then found the sexier syntax and went with that instead.
+
+...actually NEVER MIND! Let's keep going with what we have.
+But it's cool to know the sexier syntax exists for quick experiments and stuff.
+
+========================================================================================
+
+After a bunch of coding, adding controllers and stuff, finally ready to try
+and test this stuff.
+Ran migrations:
+
+$ dotnet ef migrations add initial
+$ dotnet ef database update
 

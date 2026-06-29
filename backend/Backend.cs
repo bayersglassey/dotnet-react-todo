@@ -22,6 +22,9 @@ var connectionString = builder.Configuration.GetConnectionString(
 builder.Services.AddDbContext<BackendDbContext>(options =>
     options.UseSqlite(connectionString));
 
+// Needed for app.MapControllers() below
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment()) {
@@ -70,7 +73,7 @@ app.MapGet("/error-test", () => {
 
         HEADERS
         =======
-        Accept: */*
+        Accept: ...
         Host: localhost:3001
         User-Agent: curl/8.5.0
 
@@ -114,5 +117,9 @@ app.MapGet("/error-test", () => {
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/security?view=aspnetcore-10.0
 //builder.Services.AddAuthentication().AddJwtBearer();
 //builder.Services.AddAuthorization();
+
+// See Controllers.cs for the controllers, i.e. the API endpoints.
+// https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-10.0#ar6
+app.MapControllers();
 
 app.Run();

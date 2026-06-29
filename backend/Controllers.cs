@@ -40,6 +40,7 @@ namespace backend.Controllers;
 // I get around that in this case by having the update endpoint only update
 // non-null fields in the POST body.
 [Route("/items")]
+[ApiController]
 public class TodoItemController : ControllerBase {
 
     // Based on:
@@ -54,7 +55,7 @@ public class TodoItemController : ControllerBase {
     public IActionResult List(
         // Django REST Framework has a fancy automatic query parameter filter
         // system, but I couldn't find one for .NET Core / Entity Framework.
-        // So I've just implemented one filter here, allowing the fontend to
+        // So I've just implemented one filter here, allowing the frontend to
         // show only "undone" TODO items.
         // Of course, a fancier system could be implemented, so that you could
         // do things like:
@@ -99,16 +100,27 @@ public class TodoItemController : ControllerBase {
 
     [HttpPost]
     [Route("create")]
-    public IActionResult Create(CreateBody body) {
-        var item = new TodoItem { Title = body.title, Content = "" };
+    public IActionResult Create(TodoItemCreateBody body) {
+        var item = new TodoItem { Title = body.Title, Content = "" };
         _db.TodoItems.Add(item);
         _db.SaveChanges();
-        return CreatedAtAction(nameof(Details), item);
+
+        // NOTE: I think something like is supposed to let us return a 201 Created:
+        //
+        //    return CreatedAtAction(nameof(Details), item);
+        //
+        // ...but when I try that, it throws this:
+        //
+        //    System.InvalidOperationException: No route matches the supplied values.
+        //       at Microsoft.AspNetCore.Mvc.CreatedAtActionResult.OnFormatting(ActionContext context)
+        //
+        // ...so for now, we just return 200 OK.
+        return Ok(item);
     }
 
     [HttpPost]
     [Route("update/{itemId}")]
-    public IActionResult Update(int itemId, UpdateBody body) {
+    public IActionResult Update(int itemId, TodoItemUpdateBody body) {
         // NOTE: we are getting the item, then updating the fields of the
         // resulting C# object, then saving the item.
         // That's 2 SQL queries!.. we could presumably use one UPDATE.
@@ -126,22 +138,18 @@ public class TodoItemController : ControllerBase {
 
         // Only use non-null fields of the POST body, so e.g. we can complete
         // a TODO item without accidentally changing its title or content.
-        if (body.title is not null) item.Title = body.title;
-        if (body.content is not null) item.Content = body.content;
-        item.Completed = body.completed;
+        // Something about this "if (body.X is not null) item.X = body.X"
+        // pattern seems repetetive, though...
+        // In Python, I'd be using body as the **kwargs for something or
+        // other. :D
+        // Ah well, I guess that's just how it is in strongly-typed land,
+        // unless we mess around with introspection or something.
+        if (body.Title is not null) item.Title = (string) body.Title;
+        if (body.Content is not null) item.Content = (string) body.Content;
+        if (body.Completed is not null) item.Completed = (bool) body.Completed;
 
         _db.SaveChanges();
         return Ok(item);
     }
 
 }
-
-
-// The expected format of the POST body of the Create endpoint.
-// Fun fact, I believe that the fact that our create/update endpoints
-// are using totally separate structures from TodoItem means that we're
-// doing what Martin Fowler calls CQS, "Command Query Separation".
-public record CreateBody(string title);
-
-// The expected format of the POST body of the Update endpoint.
-public record UpdateBody(string title, string content, bool completed);

@@ -339,4 +339,154 @@ Ran migrations:
 
 $ dotnet ef migrations add initial
 $ dotnet ef database update
+$ sqlite3 backend.sqlite
+SQLite version 3.45.1 2024-01-30 16:01:20
+Enter ".help" for usage hints.
+sqlite> .schema
+CREATE TABLE IF NOT EXISTS "__EFMigrationsLock" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK___EFMigrationsLock" PRIMARY KEY,
+    "Timestamp" TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+    "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+    "ProductVersion" TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS "TodoItems" (
+    "ItemId" INTEGER NOT NULL CONSTRAINT "PK_TodoItems" PRIMARY KEY AUTOINCREMENT,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "Completed" INTEGER NOT NULL
+);
+CREATE TABLE sqlite_sequence(name,seq);
 
+Hmmmmmmmmmmmmmmmmmmmmmm
+
+    $ curl http://localhost:3001/items/create -i -d '{}'
+    HTTP/1.1 500 Internal Server Error
+    Content-Type: text/plain; charset=utf-8
+    Date: Mon, 29 Jun 2026 03:10:56 GMT
+    Server: Kestrel
+    Transfer-Encoding: chunked
+
+    Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+     ---> Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'NOT NULL constraint failed: TodoItems.Title'.
+    ...etc...
+
+Why no nice 400?..
+My TodoItem's Title and Content fields were declared `public required`.
+I tried adding the `[Required]` attribute, but nothing changed.
+I tried calling `builder.Services.AddValidation()` in Backend.cs, but nothing changed.
+I tried turning TodoItemCreateBody from a record into a class, and marking its Title field [Required].
+Still no dice.
+
+OMG MAYBE THIS?
+https://stackoverflow.com/a/78786637
+> [Required] attribute on non-nullable struct (DateTime, int etc) or enum
+> properties will not fire a validation error even if a value is not provided.
+> If a value is provided the model binding will assign it to myDate but if not,
+> it will assign the default value for the type.
+> Either cases, a validation error will not be raised.
+> A way to overcome this behaviour is to make the property type nullable.
+
+So we need to use `[Required]` plus `public string?`, I guess. That's wiiild.
+...ah never mind,
+https://code-maze.com/aspnetcore-modelstate-validation-web-api/
+> It is worth mentioning that we could also define our Title without [Required] attribute:
+> public string Title { get; set; }
+
+...soooo I just need to use `string`, not `string?`, and the validation should
+happen. BUT IT DOESN'T. T__T
+
+Ahhhh BTW, I do need `required`, just not for validation purposes, but to
+make C# happy about the class itself.
+Otherwise, I get e.g.
+
+    Non-nullable property 'Title' must contain a non-null value when exiting
+    constructor. Consider adding the 'required' modifier or declaring the
+    property as nullable.
+
+Also... sounds like maybe all I need to add in order to get validation is
+the ApiController attribute?..
+YAAAAAAAAAAAAAAAAAAAAAASSSS
+
+    $ curl -sH Content-Type:application/json http://localhost:3001/items/create -d '{}' | jq
+    {
+      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "errors": {
+        "$": [
+          "JSON deserialization for type 'backend.Models.TodoItemCreateBody' was missing required properties including: 'title'."
+        ],
+        "body": [
+          "The body field is required."
+        ]
+      },
+      "traceId": "00-89b534b83e9ac42194f6702112f2c2ad-71b348df22fb1585-00"
+    }
+
+Okay, but now what is this?
+
+    $ curl -isH Content-Type:application/json http://localhost:3001/items/create -d '{"title":"lala"}'
+    HTTP/1.1 500 Internal Server Error
+    Content-Type: text/plain; charset=utf-8
+    Date: Mon, 29 Jun 2026 05:59:13 GMT
+    Server: Kestrel
+    Transfer-Encoding: chunked
+
+    System.InvalidOperationException: No route matches the supplied values.
+       at Microsoft.AspNetCore.Mvc.CreatedAtActionResult.OnFormatting(ActionContext context)
+    ...etc...
+
+Ohhhhh it's from CreatedAtAction... okay whatever, let's just return 200 instead of 201. Now:
+
+    $ curl -sH Content-Type:application/json http://localhost:3001/items/create -d '{"title":"hi"}'
+    {"itemId":9,"title":"hi","content":"","completed":false}
+
+YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSS
+
+    $ curl -sH Content-Type:application/json http://localhost:3001/items/list | jq
+    [
+      {
+        "itemId": 1,
+        "title": "lala",
+        "content": "",
+        "completed": false
+      },
+      {
+        "itemId": 2,
+        "title": "lala",
+        "content": "",
+        "completed": false
+      },
+      ...etc...
+    ]
+
+    $ curl -sH Content-Type:application/json http://localhost:3001/items/update/8 -d '{"title":"BOO"}' | jq
+    {
+      "itemId": 8,
+      "title": "BOO",
+      "content": "",
+      "completed": false
+    }
+
+    $ curl -sH Content-Type:application/json http://localhost:3001/items/update/8 -d '{"content":"hello"}' | jq
+    {
+      "itemId": 8,
+      "title": "BOO",
+      "content": "hello",
+      "completed": false
+    }
+
+    $ curl -sH Content-Type:application/json http://localhost:3001/items/update/8 -d '{"completed":true}' | jq
+    {
+      "itemId": 8,
+      "title": "BOO",
+      "content": "hello",
+      "completed": true
+    }
+
+Waaaaahahahahaaaaaaaaaa it's workiiiiiiiiiiiiiiiiiing
+
+Alll righty, time to immortalize that as integration tests. Where do we put those?..
+Those .http files or whatever?..

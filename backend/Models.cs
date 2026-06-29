@@ -51,6 +51,21 @@ public class TodoItem {
     // constructor auto-populate it.
     // But if I add the field, then I'll feel like I need to render it in the
     // frontend, and I'd prefer to keep things simple for now...
-    //public required DateTime CreatedAt { get; set; }
+    //public DateTime? CreatedAt { get; set; }
 
+}
+
+// The expected format of the POST body of the Create endpoint.
+// Fun fact, I believe that the fact that our create/update endpoints
+// are using totally separate structures from TodoItem means that we're
+// doing what Martin Fowler calls CQS, "Command Query Separation".
+public class TodoItemCreateBody {
+    public required string Title { get; set; }
+}
+
+// The expected format of the POST body of the Update endpoint.
+public class TodoItemUpdateBody {
+    public string? Title { get; set; }
+    public string? Content { get; set; }
+    public bool? Completed { get; set; }
 }

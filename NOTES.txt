@@ -527,4 +527,10 @@ $ npm install swr
 Ooooooof we've got... some kind of app up & running!..
 It can grab stuff from /items/list and display it as an Accordion.
 
+========================================================================================
 
+Okay, ended up getting in the zone, forgetting about writing down
+stream-of-consciousness stuff, and just powered through to get an
+MVP so I could submit the assignment.
+
+Here end the notes!

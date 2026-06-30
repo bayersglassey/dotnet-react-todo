@@ -4,10 +4,14 @@ import useSWR from 'swr';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@mui/material/Button';
-
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 const BASE_API_URL = process.env.BASE_API_URL || 'http://localhost:3001';
 
@@ -29,7 +33,7 @@ function TodoItem({item}) {
 
   return (
     <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <AccordionSummary expandIcon={<ExpandMore />}>
         <Typography component="span">Item {item.itemId}: {item.title}</Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -37,6 +41,13 @@ function TodoItem({item}) {
         <Button>Edit</Button>
       </AccordionDetails>
     </Accordion>
+  );
+}
+
+
+function AddTodoItem() {
+  return (
+    <Accordion />
   );
 }
 
@@ -50,13 +61,26 @@ export default function App() {
     BASE_API_URL + '/items/list', api_fetcher);
 
   return (
-    <div className="App">
-      {
-        error? <Typography>Error loading TODO items!</Typography>
-        : isLoading? <Typography>Loading TODO items...</Typography>
-        : !items || !items.length? <Typography>No items yet.</Typography>
-        : items.map(item => <TodoItem key={item.itemId} item={item} />)
-      }
-    </div>
+    <>
+      <CssBaseline />
+      <Container component="main" maxWidth="xs">
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar position="static">
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                News
+              </Typography>
+            </Toolbar>
+          </AppBar>
+        </Box>
+        {
+          error? <Typography>Error loading TODO items!</Typography>
+          : isLoading? <Typography>Loading TODO items...</Typography>
+          : !items || !items.length? <Typography>No items yet.</Typography>
+          : items.map(item => <TodoItem key={item.itemId} item={item} />)
+        }
+        <AddTodoItem />
+      </Container>
+    </>
   );
 }

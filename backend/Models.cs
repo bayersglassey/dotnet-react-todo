@@ -61,6 +61,7 @@ public class TodoItem {
 // doing what Martin Fowler calls CQS, "Command Query Separation".
 public class TodoItemCreateBody {
     public required string Title { get; set; }
+    public required string Content { get; set; }
 }
 
 // The expected format of the POST body of the Update endpoint.

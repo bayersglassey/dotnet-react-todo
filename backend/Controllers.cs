@@ -115,7 +115,10 @@ public class TodoItemController : ControllerBase {
     [HttpPost]
     [Route("create")]
     public IActionResult Create(TodoItemCreateBody body) {
-        var item = new TodoItem { Title = body.Title, Content = "" };
+        var item = new TodoItem {
+            Title = body.Title,
+            Content = body.Content,
+        };
         _db.TodoItems.Add(item);
         _db.SaveChanges();
 

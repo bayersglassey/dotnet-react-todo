@@ -64,6 +64,11 @@ https://github.com/dib0/NHapiTools
 https://github.com/dib0/HL7Fuse
 
 
+## The result
+
+![The app](screenshots/app.png)
+
+
 ## Learning .NET Core
 
 Microsoft's official docs are fantastic, so I basically just used those.
@@ -142,7 +147,14 @@ TODO: add Dockerfile support for docker-compose
 There is a test suite which hits the API.
 Make sure the backend is running locally (see above), then:
 
-    $ ./apitests.sh
+    $ ./apitests.sh 
+    === Clearing the database...
+    === Checking for empty array of items...
+    === Adding an item...
+    === Checking for array of 2 items...
+    === Checking item details...
+    === Updating item...
+    === Test suite OK!
 
 Yes, I know there are better integration test frameworks than a bash script.
 Sorry about that; see apitests.sh for details!

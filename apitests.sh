@@ -60,7 +60,7 @@ assertEqual() {
 # THE TEST SUITE
 
 log "Clearing the database..."
-sqlite3 backend.sqlite 'DELETE FROM TodoItems'
+sqlite3 backend/backend.sqlite 'DELETE FROM TodoItems'
 
 log "Checking for empty array of items..."
 assertEqual "$(apiGet items/list | jq -c)" "[]"
@@ -85,3 +85,5 @@ assertEqual \
         apiPost items/update/"$itemId1" '{"content": "bonjour", "completed": true}' \
         | jq -c '{title, content, completed}')" \
     '{"title":"Test Item 1","content":"bonjour","completed":true}'
+
+log "Test suite OK!"

@@ -38,11 +38,9 @@ const postJson = (url, data) => fetch(url, {
 });
 
 
-function TodoItem({item}) {
+function TodoItem({item, mutateItems}) {
 
   // TODO: add item editing capability.
-  // See: https://swr.vercel.app/docs/mutation
-  // ...oh wait, we're using SWR 2.0, so: https://swr.vercel.app/blog/swr-v2
 
   return (
     <Accordion>
@@ -62,14 +60,31 @@ function AddTodoItem({mutateItems}) {
 
   async function doAdd(event) {
     event.preventDefault();
-    const elems = event.target.elements;
+    const form = event.target;
+    const elems = form.elements;
     const item = {
         title: elems.title.value,
         content: elems.content.value,
     };
     console.log("Adding item!", item);
+
+    // TODO: we should really disable the form or something here, to
+    // prevent multiple submissions.
+    // But what if the POST times out?.. we don't want to leave the form
+    // disabled forever!.. so we should probably also have a timeout
+    // on the POST, etc.
+    // We don't want to be doing all these things ourselves, though; we
+    // should really be using a React form framework, ideally with SWR
+    // integration?..
+    // I'm not familiar enough with Material UI to know of such a thing
+    // off the top of my head, or how to whip one together quickly.
     await postJson(BASE_API_URL + '/items/create', item);
     mutateItems();
+
+    // Clear the form fields
+    // (and re-enable it, if we had disabled it before)
+    elems.title.value = '';
+    elems.content.value = '';
   }
 
   return (
@@ -127,7 +142,11 @@ export default function App() {
           error? <Typography>Error loading TODO items!</Typography>
           : isLoading? <Typography>Loading TODO items...</Typography>
           : !items || !items.length? <Typography>No items yet.</Typography>
-          : items.map(item => <TodoItem key={item.itemId} item={item} />)
+          : items.map(item => <TodoItem
+            key={item.itemId}
+            item={item}
+            mutateItems={mutateItems}
+          />)
         }
         <AddTodoItem mutateItems={mutateItems} />
       </Container>

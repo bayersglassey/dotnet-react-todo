@@ -9,11 +9,10 @@ The requirements for the app were basically:
 * Frontend uses React or Vue
 
 This README.md is a high-level description of my approach to this assignment.
-For a more "raw", stream-of-consciousness record of what I did, see NOTES.txt.
+For a more "raw", stream-of-consciousness record of what I did, see
+[NOTES.txt](NOTES.txt).
 For low-level, but "curated" (not stream-of-consciousness) descriptions of
-my solution, see the comments in:
-* backend/Backend.cs
-* frontend/src/App.js
+my solution, see the comments in the .cs and .js files.
 
 NOTE: I didn't use an LLM for any of this: in particular, all words in the
 documentation & comments are my own.
@@ -59,9 +58,9 @@ However, I ran up against the deadline, and didn't end up having time for
 either of those!..
 I did find some HL7 packages for .NET which I believe would have made it
 relatively simple to set up an HL7 listener:
-https://github.com/nHapiNET/nHapi
-https://github.com/dib0/NHapiTools
-https://github.com/dib0/HL7Fuse
+* https://github.com/nHapiNET/nHapi
+* https://github.com/dib0/NHapiTools
+* https://github.com/dib0/HL7Fuse
 
 
 ## The result
@@ -81,9 +80,9 @@ I ended up totally rewriting Program.cs, and renaming it to Backend.cs.
 I kept the number of .cs files to a minimum, so that I could write long
 comments and let assignment reviewers read them without having to switch
 between a bunch of tiny files:
-* Backend.cs
-* Models.cs
-* Controllers.cs
+* [Backend.cs](backend/Backend.cs)
+* [Models.cs](backend/Models.cs)
+* [Controllers.cs](backend/Controllers.cs)
 
 
 ## Making the React app
@@ -91,11 +90,11 @@ between a bunch of tiny files:
 I've done some React in the past, but never created a React app from scratch.
 I used `npx create-react-app` for the basic scaffold, Material UI for the
 components, and SWR for managing the data fetching.
-https://create-react-app.dev/
-https://mui.com/material-ui/
-https://swr.vercel.app/
+* https://create-react-app.dev/
+* https://mui.com/material-ui/
+* https://swr.vercel.app/
 
-The entire app is in App.js.
+The entire app is in [App.js](frontend/App.js).
 For readability, I didn't split it up into separate files for components,
 services, etc.
 
@@ -157,7 +156,7 @@ Make sure the backend is running locally (see above), then:
     === Test suite OK!
 
 Yes, I know there are better integration test frameworks than a bash script.
-Sorry about that; see apitests.sh for details!
+Sorry about that; see [apitests.sh](apitests.sh) for details!
 
 
 ## Unit tests
@@ -178,10 +177,10 @@ For the frontend (1 test):
     $ npm test
 
 For .NET Core, it looks like I would need to add a separate test project:
-https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-nunit
+* https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-nunit
 > Change the directory to the PrimeService.Tests directory and create
 > a new project using the following command:
-> dotnet new nunit
+>   dotnet new nunit
 
 ...I don't actually understand the .NET build system well enough to know
 how projects are connected, e.g. how the unit test project would import

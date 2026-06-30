@@ -1,5 +1,5 @@
 
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -9,14 +9,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@mui/material/Button';
 
 
-// TODO: make this URL configurable.
-const BASE_API_URL = 'http://localhost:3001';
+const BASE_API_URL = process.env.BASE_API_URL || 'http://localhost:3001';
 
 
-const fetcher = url => fetch(url).then(res => res.json()).then(data => {
+const api_fetcher = url => fetch(url).then(res => res.json()).then(data => {
     // This is the "fetcher" function for use with SWR.
-    // I'm logging stuff at the moment to debug SWR and its cache...
-    console.log("Got data for: " + url, data);
+    // That is, SWR maintains a cache of API calls, and when it needs to
+    // actually make a call, this function is what it calls.
+    //console.log("Got data for: " + url, data);
     return data;
 });
 
@@ -46,11 +46,8 @@ export default function App() {
   // NOTE: SWR can do pagination quite easily, see: https://swr.vercel.app/docs/pagination
   // And Material UI has a Pagination component: https://mui.com/material-ui/react-pagination/
   // ...however, our API doesn't currently support pagination!
-  const { data: items, error, isLoading } = useSWR(BASE_API_URL + '/items/list', fetcher);
-
-  console.log("App with items", items);
-  const { cache } = useSWRConfig();
-  console.log("Cache", cache);
+  const { data: items, error, isLoading } = useSWR(
+    BASE_API_URL + '/items/list', api_fetcher);
 
   return (
     <div className="App">

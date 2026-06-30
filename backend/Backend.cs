@@ -25,18 +25,45 @@ builder.Services.AddDbContext<BackendDbContext>(options =>
 // Needed for app.MapControllers() below
 builder.Services.AddControllers();
 
+// Authentication & authorization:
+// I'm trying to learn .NET Core under a deadline here, so I'm not going to
+// get too deep into this right now.
+// But at a high level, let's say our TODO app is a SaaS product, so our
+// clients will access the frontend, which will cause their browser to make
+// calls to the backend, which is deployed in the cloud.
+// So, we need a login page, maybe with some kind of SSO support, using OpenID
+// Connect or Okta or whatever.
+// Somehow or other, the login process should result in a token being saved
+// in user's cookies, so it gets sent with every call they make to the API.
+// It looks to me like AddAuthentication().AddJwtBearer() is the middleware
+// thing we would use on the backend, and then we would map JWT tokens to
+// users (presumably corresponding to a User model in the db).
+// In Django, there's support for users and even sessions out of the box; I
+// searched for a .NET Core equivalent, and found "Session and state management
+// in ASP.NET Core", which mentions builder.Services.AddSession().
+// Anyway, for now, we don't do any of that: each instance of our app just
+// has a global set of unsecured TODO items living in an SQLite database. :)
+// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/security?view=aspnetcore-10.0
+//builder.Services.AddAuthentication().AddJwtBearer();
+//builder.Services.AddAuthorization();
+
+// Allowing our frontend to hit our backend when running locally.
+// https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-10.0
+var CorsPolicyName = "_cors_policy";
+builder.Services.AddCors(options => {
+    options.AddPolicy(
+        name: CorsPolicyName,
+        policy => {
+            policy.WithOrigins("http://localhost:3000");
+        }
+    );
+});
+
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment()) {
-    // Apparently you can set up an exception-handling page, so you can
-    // see stack trace etc in your browser.
-    // But that only really makes sense if we're rendering HTML server-side,
-    // which we're not.
-    // I think so long as we have logging configured in such a way that stack
-    // traces are dumped to stderr, I'm happy for now.
-    // (Ah, and they are!.. see the /error-test endpoint below.)
-    // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-10.0
-    //app.UseExceptionHandler("/Error");
+if (app.Environment.IsDevelopment()) {
+    // Make sure our frontend can hit our backend when running locally!..
+    app.UseCors(CorsPolicyName);
 }
 
 // Logging isn't configured here, it's configured in appsettings.json and
@@ -95,28 +122,6 @@ app.MapGet("/error-test", () => {
 // things simple.
 //app.UseHttpsRedirection();
 //app.UseHSTS();
-
-// Authentication & authorization:
-// I'm trying to learn .NET Core under a deadline here, so I'm not going to
-// get too deep into this right now.
-// But at a high level, let's say our TODO app is a SaaS product, so our
-// clients will access the frontend, which will cause their browser to make
-// calls to the backend, which is deployed in the cloud.
-// So, we need a login page, maybe with some kind of SSO support, using OpenID
-// Connect or Okta or whatever.
-// Somehow or other, the login process should result in a token being saved
-// in user's cookies, so it gets sent with every call they make to the API.
-// It looks to me like AddAuthentication().AddJwtBearer() is the middleware
-// thing we would use on the backend, and then we would map JWT tokens to
-// users (presumably corresponding to a User model in the db).
-// In Django, there's support for users and even sessions out of the box; I
-// searched for a .NET Core equivalent, and found "Session and state management
-// in ASP.NET Core", which mentions builder.Services.AddSession().
-// Anyway, for now, we don't do any of that: each instance of our app just
-// has a global set of unsecured TODO items living in an SQLite database. :)
-// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/security?view=aspnetcore-10.0
-//builder.Services.AddAuthentication().AddJwtBearer();
-//builder.Services.AddAuthorization();
 
 // See Controllers.cs for the controllers, i.e. the API endpoints.
 // https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-10.0#ar6

@@ -85,6 +85,20 @@ public class TodoItemController : ControllerBase {
         // pagination.
         [FromQuery(Name = "undone")] bool undone
     ) {
+        // NOTE: we're returning full TodoItem instances here, which isn't
+        // really what I want... I would like to not bother grabbing e.g.
+        // the Content fields from the database, when we're just listing
+        // items.
+        // In Django, there's a way to grab dicts with a subset of your
+        // model's fields, instead of full-on model instances.
+        // I did some searching, and it looks like "table splitting" is the
+        // EF functionality which one is "supposed" to use for this:
+        // https://learn.microsoft.com/en-us/ef/core/modeling/table-splitting
+        // ...however, that page is talking about a modelBuilder, which I
+        // don't have (I used attributes instead, like [Required] etc).
+        // So it's not clear to me whether I would be able to make use of
+        // this without switching to modelBuilder... and the deadline looms,
+        // so I won't look into it any further right now!
         IQueryable<TodoItem> items = _db.TodoItems;
         if (undone) items = items.Where(item => item.Completed);
         return Ok(items); // Do we need to do items.ToList()?..

@@ -27,6 +27,11 @@ If I were to be working with .NET a lot, I would switch to VSCode or
 something.
 
 
+## The result
+
+![The app](screenshots/app.png)
+
+
 ## The plan
 
 I had never used .NET Core before, and I hadn't done UI stuff in a while, so
@@ -64,11 +69,6 @@ relatively simple to set up an HL7 listener:
 * https://github.com/dib0/HL7Fuse
 
 
-## The result
-
-![The app](screenshots/app.png)
-
-
 ## Learning .NET Core
 
 Microsoft's official docs are fantastic, so I basically just used those.
@@ -95,7 +95,7 @@ components, and SWR for managing the data fetching.
 * https://mui.com/material-ui/
 * https://swr.vercel.app/
 
-The entire app is in [App.js](frontend/App.js).
+The entire app is in [App.js](frontend/src/App.js).
 For readability, I didn't split it up into separate files for components,
 services, etc.
 

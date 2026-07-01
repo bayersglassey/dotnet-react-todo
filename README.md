@@ -55,8 +55,8 @@ I wanted to show some creativity if possible, so I thought about what the compan
 which I was applying was doing: "AI-driven MRI scans".
 I imagined a TODO app for radiologists, where each TODO item has an associated MRI
 image, and asks the radiologist to outline things within it (tumors, etc).
-The outlining could be done with a simple <canvas>-based component, allowing the
-user to draw red lines on the image.
+The outlining could be done with a simple `<canvas>`-based component, allowing
+the user to draw red lines on the image.
 Also, I had worked previously with HL7 (a health industry data exchange protocol),
 and saw HL7 listed as a nice-to-have in the job description, so I imagined an
 HL7 "listener" service which would generate TODO items from HL7 messages.

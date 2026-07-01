@@ -1,8 +1,9 @@
 # TODO app for radiologists
 
-This repo contains my submission for a take-home assignment I got a job application.
+This repo contains my submission for the "take-home assignment" portion
+of a job application.
 
-The requirements for the app were basically:
+The requirements were, in brief:
 * Small to-do task management API and frontend
 * Backend uses .NET Core
 * Database uses EF Core in-memory or SQLite

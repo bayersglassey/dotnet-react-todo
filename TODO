@@ -1,5 +1,4 @@
 
-Things we need to include for sure:
 * Add a TodoItem record, sqlite backed, endpoints (/list, /details, /update)
 * Add a UI
     * Single-page, one giant list of items, a little form for adding new ones
@@ -14,10 +13,10 @@ Things we need to include for sure:
 * Accessibility
     * E.g. internationalization... I searched "react i18n" and found: https://react.i18next.com/
 * Support for different devices
-
-Optional stuff:
+    * Handled by Material UI
 * Pagination
 * Local cache of TODO items, so we don't need so many API calls
+    * Ended up being taken care of by SWR, nice...
 * Docker compose for backend + frontend (and later, HL7 listener)
 * Add images to each TodoItem, UI component for drawing outlines on them
 * Add an HL7 listener
